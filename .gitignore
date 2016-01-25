@@ -2,3 +2,4 @@ node_modules/
 build/
 *.mp3
 *.cmd
+client2/dist
