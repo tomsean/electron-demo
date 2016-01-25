@@ -3,3 +3,5 @@ build/
 *.mp3
 *.cmd
 client2/dist
+client2/node_modules
+server/node_modules
