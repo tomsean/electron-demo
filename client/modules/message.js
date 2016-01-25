@@ -1,38 +1,45 @@
-var ipc = require('ipc');
-var arr = [];
-$(document).on('click', '#close', function(){	
-	ipc.sendSync('close:mess');
-});
-$(document).on('click', '#min', function(){
-	ipc.sendSync('minimize:mess');
-});
-
-ipc.on('show:left', function(arg) {
-	if(arr.indexOf(arg)==-1){
-		var html = '<li><img src="../images/logo.png"><span class="nickname">'+arg+'</span></li>';
-		$(".cont-right").find('.name').text(arg);
-		$(html).insertBefore($('.left').find('li').eq(0));
-		$('.left').show();
-		$('.top').css({'padding-left': '180px'});
-		$('.footer').css({'padding-left': '180px'});
-		$('.right').css({'padding-left': '180px'});
+$(function(){
+	var ipc = require('ipc');
+	var ipcRenderer = require('electron').ipcRenderer;
+	var	BrowserWindow =require('electron').remote.BrowserWindow;
+	var win = BrowserWindow.getFocusedWindow();
+	var path = require('path');
+	var arr = [];
+	$(document).on('click', '#close', function(){
+		if(win){
+			win.close();
+		}
+	});
+	$(document).on('click', '#min', function(){
+		if(win){
+			win.minimize();
+		}
+	});
+	ipc.on('show:left', function(arg) {
+		if(arr.indexOf(arg)==-1){
+			var html = '<li><img src="../images/logo.png"><span class="nickname">'+arg+'</span></li>';
+			$(".cont-right").find('.name').text(arg);
+			$(html).insertBefore($('.left').find('li').eq(0));
+			$('.left').show();
+			$('.top').css({'padding-left': '180px'});
+			$('.footer').css({'padding-left': '180px'});
+			$('.right').css({'padding-left': '180px'});
+			arr.push(arg);
+		}
+	});
+	ipc.on('transfer:name', function(arg) {
 		arr.push(arg);
-	}
-});
-ipc.on('transfer:name', function(arg) {
-	arr.push(arg);
-	var html = '<li><img src="../images/logo.png"><span class="nickname">'+arg+'</span></li>';
-	$(".top").find('.name').text(arg);
-	$(".cont-right").find('.name').text(arg);
-	$('.left').find('ul').append(html);
-});
+		var html = '<li><img src="../images/logo.png"><span class="nickname">'+arg+'</span></li>';
+		$(".top").find('.name').text(arg);
+		$(".cont-right").find('.name').text(arg);
+		$('.left').find('ul').append(html);
+	});
 
-$(document).on('dblclick', '.left li', function(){
-	var name = $(this).find('.nickname').text();
-	$('.top').find('.name').text(name);
+	$(document).on('dblclick', '.left li', function(){
+		var name = $(this).find('.nickname').text();
+		$('.top').find('.name').text(name);
+	});
 });
-
-
 (function () {
 	var d = document,
 	w = window,

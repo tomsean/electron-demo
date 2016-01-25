@@ -1,17 +1,45 @@
-var ipc = require('ipc');
+$(function(){
+	var ipcRenderer = require('electron').ipcRenderer;
+	var remote=require('electron').remote;
+	var	BrowserWindow =remote.BrowserWindow;
+	var win = BrowserWindow.getFocusedWindow();
+	var path = require('path');
+	$(document).on('click', '#close', function(){
+		if(win){
+			win.close();
+		}
+	});
+	$(document).on('click', '#min', function(){
+		if(win){
 
-$(document).on('click', '#close', function(){	
-	ipc.sendSync('close:comm');
+			win.minimize();
+		}
+	});
+	var messWindow;
+	$(document).on('dblclick', '.list dd', function(){
+		var nickname = $(this).find('.nickname').text();
+		if(messWindow){
+			messWindow.show();
+		}else{
+			messWindow = new BrowserWindow({
+				width: 700
+				,height: 510
+				,min_width: 700
+				,min_height: 510
+				,max_width: 700
+				,max_height: 510
+				,frame: false,
+				icon:path.join(__dirname, 'images', 'Genius.png')
+			});
+			messWindow.loadUrl('file://' + __dirname + '/message.html');
+			messWindow.show();
+			messWindow.webContents.send('transfer:name', name);
+			messWindow.on("closed",function(){
+				messWindow=null;
+			});
+		}
+	});
 });
-$(document).on('click', '#min', function(){
-	ipc.sendSync('minimize:comm');
-});
-
-$(document).on('dblclick', '.list dd', function(){
-	var nickname = $(this).find('.nickname').text();
-	ipc.sendSync('open:mess', nickname);
-});
-
 
 (function ($) {
 	var d = document,
@@ -32,7 +60,6 @@ $(document).on('dblclick', '.list dd', function(){
 		username:null,
 		userid:null,
 		socket:null,
-		
 		//退出，本例只是一个简单的刷新
 		logout:function(){
 			location.reload();
@@ -108,12 +135,9 @@ $(document).on('dblclick', '.list dd', function(){
 					var text = parseInt($(this).find('.badge').text()) + 1;
 					$(this).find('.badge').text(text);
 					$(this).find('.lastmess').text(obj.content);
-					
 				});
 				console.log("objContent:" + obj.content);
-				
 			});
-
 		}
 	};
 
